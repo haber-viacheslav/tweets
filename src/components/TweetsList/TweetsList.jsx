@@ -1,3 +1,19 @@
-export const TweetsList = () => {
-  return <ul></ul>;
+import { TweetItem } from 'components/TweetItem/TweetItem';
+import { StyledTweetsList } from './TweetsList.styled';
+export const TweetsList = ({ tweets }) => {
+  return (
+    <StyledTweetsList>
+      {tweets.length > 0 &&
+        tweets.map(({ id, tweets, followers, avatar, user }) => (
+          <TweetItem
+            key={id}
+            tweets={tweets}
+            followers={followers}
+            avatar={avatar}
+            user={user}
+            id={id}
+          />
+        ))}
+    </StyledTweetsList>
+  );
 };

@@ -13,11 +13,11 @@ export const NavItem = styled.li`
 export const NavLinkItem = styled(NavLink)`
   color: #ffffff;
   font-size: 24px;
+  transition-duration: 500ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   :hover,
   :focus,
   &.active {
     color: #af85ff;
-    transition-duration: 300ms;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   }
 `;
