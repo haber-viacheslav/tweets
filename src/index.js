@@ -10,14 +10,14 @@ const theme = createTheme({
       paper: '#fff',
     },
     text: {
-      primary: '#e7edf3',
+      primary: '#ffffff',
       secondary: '#4d5ef9',
     },
     action: {
       active: '#2592fe',
     },
     success: {
-      dark: '#009688',
+      dark: '#599bff',
     },
   },
 });

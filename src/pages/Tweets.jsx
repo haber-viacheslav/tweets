@@ -9,6 +9,8 @@ import { LoadMoreBtn } from 'components/LoadMoreBtn/LoadMoreBtn';
 import { getItem, setItem } from 'helpers/localStorage';
 import { Loader } from 'components/Loader/Loader';
 import { uniqueBy } from 'helpers/uniqueBy';
+import { BackToHomeBtn } from 'components/BackToHomeBtn/BackToHomeBtn';
+import { Wrapper } from './Home.styled';
 
 const Tweets = () => {
   const [tweets, setTweets] = useState([]);
@@ -22,7 +24,10 @@ const Tweets = () => {
     }
     return localData;
   });
-  const [searchParams, setSearchParams] = useSearchParams({});
+  const [searchParams, setSearchParams] = useSearchParams({
+    page: 1,
+    limit: 3,
+  });
 
   const params = useMemo(
     () => Object.fromEntries([...searchParams]),
@@ -120,7 +125,11 @@ const Tweets = () => {
   return (
     <Section>
       <Container>
-        <Filter onChange={onFilterSelect} filter={filter} />
+        <Wrapper>
+          <BackToHomeBtn />
+          <Filter onChange={onFilterSelect} filter={filter} />
+        </Wrapper>
+
         {visibleTweets.length > 0 && (
           <TweetsList
             tweets={visibleTweets}

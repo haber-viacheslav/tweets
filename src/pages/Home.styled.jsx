@@ -9,11 +9,25 @@ export const DescriptionList = styled.ul`
 export const DescriptionItem = styled.li``;
 
 export const BgWrapper = styled.div`
-  height: 100%;
+  height: 93vh;
   margin-left: auto;
   margin-right: auto;
   background-repeat: no-repeat;
-  background-position: center -70px;
+  background-position: center;
   background-size: 100%;
   background-image: url(${hero});
+`;
+
+export const Wrapper = styled.div`
+  border-radius: 10px;
+  padding: 30px 10px;
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: #683eff;
+  margin-bottom: 20px;
 `;
