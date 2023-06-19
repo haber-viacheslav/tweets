@@ -12,53 +12,17 @@ import {
   AvatarWrp,
 } from './TweetItem.styled';
 import { FollowBtn } from 'components/FollowBtn/FollowBtn';
-import { useState } from 'react';
-import { getItem, setItem } from 'helpers/localStorage';
-import { uniqueBy } from 'helpers/uniqueBy';
 
-export const TweetItem = ({ user, tweets, followers, avatar, id }) => {
-  const initIsFollow = !!getItem('users')
-    ? getItem('users').filter(item => item.id === id)
-    : false;
-  console.log('users', !!getItem('users'));
-  console.log('initIsFollow', initIsFollow);
-
-  const [isFollow, setIsFollow] = useState(initIsFollow);
-  const [followersCount, setFollowersCount] = useState(followers);
-  const handleFollowChange = () => {
-    const localUsers = getItem('users');
-    if (isFollow) {
-      setIsFollow(prevIsFollow => !prevIsFollow);
-      setFollowersCount(prevCount => prevCount - 1);
-      const updatedUser = {
-        user,
-        tweets,
-        followers: followersCount,
-        avatar,
-        id,
-        isFollow: !isFollow,
-      };
-      if (!localUsers) {
-        return setItem('users', [updatedUser]);
-      }
-      setItem('users', uniqueBy([updatedUser, ...localUsers], 'id'));
-    } else {
-      setIsFollow(prevIsFollow => !prevIsFollow);
-      setFollowersCount(prevCount => prevCount + 1);
-      const updatedUser = {
-        user,
-        tweets,
-        followers: followersCount,
-        avatar,
-        id,
-        isFollow: !isFollow,
-      };
-      if (!localUsers) {
-        return setItem('users', [updatedUser]);
-      }
-      setItem('users', uniqueBy([updatedUser, ...localUsers], 'id'));
-    }
-  };
+export const TweetItem = ({
+  user,
+  tweets,
+  followers,
+  avatar,
+  id,
+  followed,
+  onFollowChange,
+}) => {
+  const followersCount = followed ? followers + 1 : followers - 1;
 
   return (
     <TweetStyledItem>
@@ -78,8 +42,11 @@ export const TweetItem = ({ user, tweets, followers, avatar, id }) => {
         </AvatarWrp>
 
         <Tweets>{tweets} Tweets</Tweets>
-        <Followers>{followersCount} Followers</Followers>
-        <FollowBtn isFollow={isFollow} onClick={handleFollowChange} />
+        <Followers>
+          {followersCount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}{' '}
+          Followers
+        </Followers>
+        <FollowBtn isFollow={followed} onClick={() => onFollowChange(id)} />
       </ContentWrp>
     </TweetStyledItem>
   );

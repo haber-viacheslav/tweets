@@ -1,4 +1,5 @@
 import { Container } from 'components/Container/Container';
+import { Section } from 'components/Section/Section';
 import { Filter } from 'components/Filter/Filter';
 import { TweetsList } from 'components/TweetsList/TweetsList';
 import { useState, useEffect, useMemo } from 'react';
@@ -6,18 +7,22 @@ import { useSearchParams } from 'react-router-dom';
 import { fetchTweets } from 'api/tweetsService';
 import { LoadMoreBtn } from 'components/LoadMoreBtn/LoadMoreBtn';
 import { getItem, setItem } from 'helpers/localStorage';
-import { uniqueBy } from 'helpers/uniqueBy';
 import { Loader } from 'components/Loader/Loader';
+import { uniqueBy } from 'helpers/uniqueBy';
 
 const Tweets = () => {
-  const [tweets, setTweets] = useState(getItem('users') || []);
+  const [tweets, setTweets] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [totalPages, setTotalPages] = useState(0);
   const [filter, setFilter] = useState('all');
-  const [searchParams, setSearchParams] = useSearchParams({
-    page: 1,
-    limit: 3,
+  const [follows, setIsFollows] = useState(() => {
+    const localData = getItem('follows');
+    if (!localData) {
+      return {};
+    }
+    return localData;
   });
+  const [searchParams, setSearchParams] = useSearchParams({});
 
   const params = useMemo(
     () => Object.fromEntries([...searchParams]),
@@ -31,6 +36,7 @@ const Tweets = () => {
         limit: 3,
         ...params,
       }),
+
     [params, setSearchParams]
   );
 
@@ -46,17 +52,17 @@ const Tweets = () => {
           setTotalPages(
             Math.round(response.data.length / +searchParams.get('limit'))
           );
-          console.log('Total', totalPages);
         }
       } catch (e) {
         setTweets([]);
+        setTotalPages(0);
         console.log(e.message);
       } finally {
         setIsLoading(false);
       }
     };
     getAllTweets();
-  }, []);
+  }, [searchParams]);
 
   useEffect(() => {
     setIsLoading(true);
@@ -66,7 +72,6 @@ const Tweets = () => {
         if (response.statusText !== 'OK') {
           return;
         }
-
         setTweets(prevTweets => {
           return params.page === '1'
             ? response.data
@@ -74,6 +79,7 @@ const Tweets = () => {
         });
       } catch (e) {
         setTweets([]);
+        setTotalPages(0);
         console.log(e.message);
       } finally {
         setIsLoading(false);
@@ -88,27 +94,44 @@ const Tweets = () => {
   const onFilterSelect = filter => {
     setFilter(filter);
   };
+
+  const handleFollowChange = id => {
+    setIsFollows(prevFollows => {
+      return {
+        ...prevFollows,
+        [id]: prevFollows[id] ? !prevFollows[id] : true,
+      };
+    });
+  };
+
   const filterTweets = (items, filter) => {
     switch (filter) {
       case 'follow':
-        return items.filter(item => !item.follow);
+        return items.filter(item => follows[item.id] !== true);
       case 'followings':
-        return items.filter(item => item.follow);
+        return items.filter(item => follows[item.id] === true);
       default:
         return items;
     }
   };
-  const visibleTweets = filterTweets(tweets, filter);
 
+  const visibleTweets = filterTweets(tweets, filter);
+  setItem('follows', follows);
   return (
-    <section>
+    <Section>
       <Container>
-        <Filter onClick={onFilterSelect} />
-        {visibleTweets.length > 0 && <TweetsList tweets={visibleTweets} />}
+        <Filter onChange={onFilterSelect} filter={filter} />
+        {visibleTweets.length > 0 && (
+          <TweetsList
+            tweets={visibleTweets}
+            onFollowChange={handleFollowChange}
+            follows={follows}
+          />
+        )}
       </Container>
       {totalPages > +params.page && <LoadMoreBtn onClick={handleOnLoad} />}
       {isLoading && <Loader />}
-    </section>
+    </Section>
   );
 };
 

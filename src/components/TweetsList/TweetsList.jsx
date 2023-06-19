@@ -1,6 +1,6 @@
 import { TweetItem } from 'components/TweetItem/TweetItem';
 import { StyledTweetsList } from './TweetsList.styled';
-export const TweetsList = ({ tweets }) => {
+export const TweetsList = ({ tweets, follows, onFollowChange }) => {
   return (
     <StyledTweetsList>
       {tweets.length > 0 &&
@@ -12,6 +12,8 @@ export const TweetsList = ({ tweets }) => {
             avatar={avatar}
             user={user}
             id={id}
+            followed={follows[id] ? follows[id] : false}
+            onFollowChange={onFollowChange}
           />
         ))}
     </StyledTweetsList>
